@@ -26,7 +26,7 @@ $ cmake ../llvm \
   -G Ninja
 $ ninja clang-tidy
 ```
-- `build/` must be a directory with MLIR onfigured. It is highly advised to
+- `build/` must be a directory with MLIR configured. It is highly advised to
   use `ccache` as well, as this directory will be used to rerun
   `ninja check-mlir` after every single clang-tidy fix.
 ```bash
@@ -47,4 +47,3 @@ $ cmake ../llvm \
   subfolder or the path to a single file.
 - `mkdir -p ~/clang-tidy-fails/` will be a directory containing the patches
   that clang-tidy produces but also fail the build.
-
