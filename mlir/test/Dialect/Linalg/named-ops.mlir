@@ -301,18 +301,34 @@ func.func @conv_2d_nhwc_hwcf(%input: tensor<?x?x?x?xf32>, %filter: tensor<?x?x?x
 
 // -----
 
-// CHECK-LABEL: func @conv_2d_ngchw_fgchw
-func.func @conv_2d_ngchw_fgchw(%input: tensor<?x?x?x?x?xf32>, %filter: tensor<?x?x?x?x?xf32>, %init: tensor<?x?x?x?x?xf32>) -> tensor<?x?x?x?x?xf32> {
-  // CHECK:      %{{.+}} = linalg.conv_2d_ngchw_fgchw
+// CHECK-LABEL: func @conv_2d_ngchw_gfchw
+func.func @conv_2d_ngchw_gfchw(%input: tensor<?x?x?x?x?xf32>, %filter: tensor<?x?x?x?x?xf32>, %init: tensor<?x?x?x?x?xf32>) -> tensor<?x?x?x?x?xf32> {
+  // CHECK:      %{{.+}} = linalg.conv_2d_ngchw_gfchw
   // CHECK-SAME:   dilations = dense<1> : tensor<2xi64>
   // CHECK-SAME:   strides = dense<1> : tensor<2xi64>
   // CHECK-SAME:   ins(%{{.+}}, %{{.+}} : tensor<?x?x?x?x?xf32>, tensor<?x?x?x?x?xf32>)
   // CHECK-SAME:   outs(%{{.+}} : tensor<?x?x?x?x?xf32>) -> tensor<?x?x?x?x?xf32>
-  %0 = linalg.conv_2d_ngchw_fgchw {dilations = dense<1> : tensor<2xi64>,
+  %0 = linalg.conv_2d_ngchw_gfchw {dilations = dense<1> : tensor<2xi64>,
                                               strides = dense<1> : tensor<2xi64>}
      ins (%input, %filter: tensor<?x?x?x?x?xf32>, tensor<?x?x?x?x?xf32>)
     outs (%init: tensor<?x?x?x?x?xf32>) -> tensor<?x?x?x?x?xf32>
   return %0 : tensor<?x?x?x?x?xf32>
+}
+
+// -----
+
+// CHECK-LABEL: func @conv_2d_ngchw_gfchw_static
+func.func @conv_2d_ngchw_gfchw_static(%input: tensor<1x2x32x128x256xf32>, %filter: tensor<2x64x32x3x5xf32>, %init: tensor<1x2x64x126x252xf32>) -> tensor<1x2x64x126x252xf32> {
+  // CHECK:      %{{.+}} = linalg.conv_2d_ngchw_gfchw
+  // CHECK-SAME:   dilations = dense<1> : tensor<2xi64>
+  // CHECK-SAME:   strides = dense<1> : tensor<2xi64>
+  // CHECK-SAME:   ins(%{{.+}}, %{{.+}} : tensor<1x2x32x128x256xf32>, tensor<2x64x32x3x5xf32>)
+  // CHECK-SAME:   outs(%{{.+}} : tensor<1x2x64x126x252xf32>) -> tensor<1x2x64x126x252xf32>
+  %0 = linalg.conv_2d_ngchw_gfchw {dilations = dense<1> : tensor<2xi64>,
+                                              strides = dense<1> : tensor<2xi64>}
+     ins (%input, %filter: tensor<1x2x32x128x256xf32>, tensor<2x64x32x3x5xf32>)
+    outs (%init: tensor<1x2x64x126x252xf32>) -> tensor<1x2x64x126x252xf32>
+  return %0 : tensor<1x2x64x126x252xf32>
 }
 
 // -----
@@ -365,14 +381,14 @@ func.func @conv_2d_nhwc_hwcf(%input: memref<?x?x?x?xf32>, %filter: memref<?x?x?x
 
 // -----
 
-// CHECK-LABEL: func @conv_2d_ngchw_fgchw
-func.func @conv_2d_ngchw_fgchw(%input: memref<?x?x?x?x?xf32>, %filter: memref<?x?x?x?x?xf32>, %output: memref<?x?x?x?x?xf32>) {
-  // CHECK:      linalg.conv_2d_ngchw_fgchw
+// CHECK-LABEL: func @conv_2d_ngchw_gfchw
+func.func @conv_2d_ngchw_gfchw(%input: memref<?x?x?x?x?xf32>, %filter: memref<?x?x?x?x?xf32>, %output: memref<?x?x?x?x?xf32>) {
+  // CHECK:      linalg.conv_2d_ngchw_gfchw
   // CHECK-SAME:   dilations = dense<1> : tensor<2xi64>
   // CHECK-SAME:   strides = dense<1> : tensor<2xi64>
   // CHECK-SAME:   ins(%{{.+}}, %{{.+}} : memref<?x?x?x?x?xf32>, memref<?x?x?x?x?xf32>)
   // CHECK-SAME:   outs(%{{.+}} : memref<?x?x?x?x?xf32>)
-  linalg.conv_2d_ngchw_fgchw {dilations = dense<1> : tensor<2xi64>,
+  linalg.conv_2d_ngchw_gfchw {dilations = dense<1> : tensor<2xi64>,
                                          strides = dense<1> : tensor<2xi64>}
      ins (%input, %filter: memref<?x?x?x?x?xf32>, memref<?x?x?x?x?xf32>)
     outs (%output: memref<?x?x?x?x?xf32>)
