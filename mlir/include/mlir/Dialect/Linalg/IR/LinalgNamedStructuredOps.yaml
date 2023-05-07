@@ -483,7 +483,8 @@ metadata: !LinalgOpMetadata
   name: matmul_transpose_b
   cpp_class_name: MatmulTransposeBOp
   doc: |-
-    Performs a matrix multiplication of two 2D inputs with rhs operand transposed.
+    Performs a matrix multiplication of two 2D inputs with rhs operand
+    transposed.
 
     Numeric casting is performed on the operands to the inner multiply, promoting
     them to the same data type as the accumulator/output.
@@ -729,8 +730,8 @@ metadata: !LinalgOpMetadata
   name: batch_matmul_transpose_b
   cpp_class_name: BatchMatmulTransposeBOp
   doc: |-
-    Performs a batched matrix multiplication of two 3D inputs where rhs operand has its non-batch
-    dimensions transposed.
+    Performs a batched matrix multiplication of two 3D inputs where rhs operand
+    has its non-batch dimensions transposed.
 
     Numeric casting is performed on the operands to the inner multiply, promoting
     them to the same data type as the accumulator/output.
@@ -4722,4 +4723,3 @@ structured_op: !LinalgStructuredOpConfig
                           scalar_const: '2.3283063999999999E-10 : f64'
             - !ScalarExpression
               scalar_arg: min
-

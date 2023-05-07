@@ -117,6 +117,22 @@ def mmt4d(lhs=TensorDef(TV.LhsType, S.M, S.K, S.M0, S.K0),
 
 
 @linalg_structured_op
+def matmul_transpose_b(A=TensorDef(T1, S.M, S.K),
+                       B=TensorDef(T2, S.N, S.K),
+                       C=TensorDef(U, S.M, S.N, output=True),
+                       cast=TypeFnAttrDef(default=TypeFn.cast_signed)):
+  """Performs a matrix multiplication of two 2D inputs with rhs operand
+  transposed.
+
+  Numeric casting is performed on the operands to the inner multiply, promoting
+  them to the same data type as the accumulator/output.
+  """
+  domain(D.m, D.n, D.k)
+  implements(ContractionOpInterface)
+  C[D.m, D.n] += cast(U, A[D.m, D.k]) * cast(U, B[D.n, D.k])
+
+
+@linalg_structured_op
 def batch_matmul(A=TensorDef(T1, Batch, S.M, S.K),
                  B=TensorDef(T2, Batch, S.K, S.N),
                  C=TensorDef(U, Batch, S.M, S.N, output=True)):
@@ -149,6 +165,23 @@ def quantized_batch_matmul(A=TensorDef(T1, Batch, S.M, S.K),
   C[D.b, D.m, D.n] += (TypeFn.cast_signed(U, A[D.b, D.m, D.k]) -
                        TypeFn.cast_signed(U, AZp)) * (TypeFn.cast_signed(
                            U, B[D.b, D.k, D.n]) - TypeFn.cast_signed(U, BZp))
+
+
+@linalg_structured_op
+def batch_matmul_transpose_b(A=TensorDef(T1, Batch, S.M, S.K),
+                             B=TensorDef(T2, Batch, S.N, S.K),
+                             C=TensorDef(U, Batch, S.M, S.N, output=True)):
+  """Performs a batched matrix multiplication of two 3D inputs where rhs operand
+  has its non-batch dimensions transposed.
+
+  Numeric casting is performed on the operands to the inner multiply, promoting
+  them to the same data type as the accumulator/output.
+  """
+  domain(D.b, D.m, D.n, D.k)
+  implements(ContractionOpInterface)
+  C[D.b, D.m,
+    D.n] += TypeFn.cast_signed(U, A[D.b, D.m, D.k]) * TypeFn.cast_signed(
+        U, B[D.b, D.n, D.k])
 
 
 @linalg_structured_op
