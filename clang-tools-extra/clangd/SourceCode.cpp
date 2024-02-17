@@ -526,23 +526,12 @@ std::optional<std::string> getCanonicalPath(const FileEntryRef F,
     }
   }
 
-  // Handle the symbolic link path case where the current working directory
-  // (getCurrentWorkingDirectory) is a symlink. We always want to the real
-  // file path (instead of the symlink path) for the  C++ symbols.
-  //
-  // Consider the following example:
-  //
-  //   src dir: /project/src/foo.h
-  //   current working directory (symlink): /tmp/build -> /project/src/
-  //
-  //  The file path of Symbol is "/project/src/foo.h" instead of
-  //  "/tmp/build/foo.h"
   if (auto Dir = FileMgr.getOptionalDirectoryRef(
           llvm::sys::path::parent_path(FilePath))) {
-    llvm::SmallString<128> RealPath;
-    llvm::StringRef DirName = FileMgr.getCanonicalName(*Dir);
-    llvm::sys::path::append(RealPath, DirName,
-                            llvm::sys::path::filename(FilePath));
+    llvm::SmallString<128> RealPath = Dir->getName();
+    FileMgr.makeAbsolutePath(RealPath);
+    llvm::sys::path::remove_dots(RealPath, /*remove_dot_dot=*/true);
+    llvm::sys::path::append(RealPath, llvm::sys::path::filename(FilePath));
     return RealPath.str().str();
   }
 
